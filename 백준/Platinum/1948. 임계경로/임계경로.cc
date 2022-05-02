@@ -2,49 +2,56 @@
 #include<queue>
 #include<vector>
 #include<tuple>
+#include<cmath>
 using namespace std;
 int n, m, s, e;
-vector <pair<int,int>> v[100001];//길
-vector<tuple<int, int, int>> rev[100001];
+vector <pair<int, int>> v[100001];//길
+vector<pair<int,int>> rev[100001];
 int d[100001];
 bool flag[100001];
+int inDegree[10001];
+int outDegree[10001];
 int main() {
 	ios_base::sync_with_stdio(false); cin.tie(NULL); cout.tie(NULL);
 	cin >> n >> m;
 	for (int i = 0; i < m; i++) {
 		int x, y, z;
 		cin >> x >> y >> z;
-		v[x].push_back({y,z});
-		rev[y].push_back({ x,z,i });
-
+		v[x].push_back({ y,z });
+		rev[y].push_back({ x,z });
+		inDegree[y]++;
+		outDegree[x]++;
 	}
 	cin >> s >> e;
-	queue<pair<int, int>> q;
-	q.push({ s,0 });
+	queue<int> q;
+	q.push(s);
 	while (!q.empty()) {
-		int x = q.front().first;
-		int y = q.front().second;
-		q.pop();
+		int x = q.front();
+		q.pop();	
 		for (int i = 0; i < v[x].size(); i++) {
-			if (d[v[x][i].first] < y + v[x][i].second) {
-				d[v[x][i].first] = y + v[x][i].second;
-				q.push({ v[x][i].first,v[x][i].second + y });
-			}
+			int dis = v[x][i].second;
+			int next = v[x][i].first;
+			d[next] = max(d[next], d[x] + dis);
+			inDegree[next]--;
+			if (inDegree[next] == 0)q.push(next);
 		}
 	}
 	cout << d[e] << '\n';
 	int counter = 0;
-	q.push({ e, d[e] });
+	flag[e] = true;
+	q.push(e);
 	while (!q.empty()) {
-		int x = q.front().first;
-		int y = q.front().second;
+		int x = q.front();
 		q.pop();
 		for (int i = 0; i < rev[x].size(); i++) {
-			if (!flag[get<2>(rev[x][i])] && d[get<0>(rev[x][i])] == y - get<1>(rev[x][i])) {
-				flag[get<2>(rev[x][i])] = true;
+			int next = rev[x][i].first;
+			int dis = rev[x][i].second;
+			if (flag[x] && d[x] - dis == d[next]) {
 				counter++;
-				q.push({ get<0>(rev[x][i]) ,y - get<1>(rev[x][i]) });
+				flag[next] = true;
 			}
+			outDegree[next]--;
+			if (outDegree[next] == 0)q.push(next);
 		}
 	}
 	cout << counter;
