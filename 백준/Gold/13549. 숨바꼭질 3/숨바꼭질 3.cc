@@ -16,12 +16,10 @@ int main() {
 	cout.tie(NULL);
 	cin >> n >> m;
 	priority_queue<pair<int, int>,vector<pair<int,int>>,greater<pair<int,int>>> pq;
-	pq.push({ 0,n });
-	for (int i = 0; i <= 100000; i++)arriveTime[i] = -2000000000;
+	pq.push({ 0,n });	
 	while (!pq.empty()) {
 		int curPosition = pq.top().second;
 		int curTime = pq.top().first;
-	//	cout << curPosition << ' ' << curTime << endl;
 		pq.pop();
 		if (flag[curPosition])continue;
 		flag[curPosition] = true;
